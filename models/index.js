@@ -14,9 +14,9 @@ if (config.use_env_variable) {
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,
-    dialect: 'postgres', // Use 'postgres' dialect for PostgreSQL
+    dialect: 'postgres',
     port: config.port,
-    logging: false, // Disable logging (you can enable it if you want to see SQL queries)
+    logging: false,
   });
 }
 
