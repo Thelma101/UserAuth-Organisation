@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../models/index').sequelize; // Adjust the path as necessary
+const sequelize = require('../models/index').sequelize;
+
 
 const User = sequelize.define('User', {
   userId: {
