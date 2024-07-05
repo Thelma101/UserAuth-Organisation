@@ -9,3 +9,6 @@ const dbSync = async () => {
     }
 }
 
+
+dbSync();
+
