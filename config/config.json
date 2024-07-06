@@ -4,6 +4,7 @@
     "password": 909090,
     "database": "database_development",
     "host": "127.0.0.1",
+    "port": 5001,
     "dialect": "postgre"
   },
   "test": {
@@ -11,6 +12,7 @@
     "password": 909090,
     "database": "database_test",
     "host": "127.0.0.1",
+    "port": 5001,
     "dialect": "postgre"
   },
   "production": {
@@ -18,6 +20,9 @@
     "password": 909090,
     "database": "database_production",
     "host": "127.0.0.1",
+    "port": 5001,
     "dialect": "postgre"
   }
 }
+
+

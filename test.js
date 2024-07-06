@@ -1,4 +1,4 @@
-const User = require('./index').User;
+const User = require('./models/index').User;
 
 const testUserModel = async () => {
   try {
