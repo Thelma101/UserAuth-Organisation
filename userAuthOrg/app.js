@@ -95,7 +95,14 @@ app.get('/api/organisations/:orgId', async (req, res) => {
             message: 'Organisation not found',
             statusCode: 404
         });
-    }});
+    }
+});
+
+res.status(200).json({
+    status: 'success',
+    data: organisation
+});
+
 
 const port = app.config.port || 3000;
 
