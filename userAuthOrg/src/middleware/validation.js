@@ -254,4 +254,8 @@ router.post('/organisations/:orgId/users', async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = {
+    validateLoginFields,
+    validateUserFields,
+    router
+}
