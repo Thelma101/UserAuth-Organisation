@@ -1,9 +1,12 @@
-
 const express = require('express');
 const validationRoutes = require('./middleware/validation');
 const authenticateToken = require('./middleware/authenticateToken');
 const authController = require('../controllers/authController');
 const authenticateJWT = require('../middleware/authenticateJWT');
+const authRoutes = require('./authRoutes');
+const userRoutes = require('./userRoutes');
+const organisationRoutes = require('./organisationRoutes');
+
 
 const app = express();
 app.use(express.json());
