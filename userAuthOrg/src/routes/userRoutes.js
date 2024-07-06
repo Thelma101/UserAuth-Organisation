@@ -54,7 +54,9 @@ router.post('/register', validateUserFields, async (req, res) => {
             message: 'Registration unsuccessful',
             statusCode: 400
         });
+        console.error('Error during registration:', error);
     }
+    
 });
 
 router.post('/login', validateLoginFields, async (req, res) => {
