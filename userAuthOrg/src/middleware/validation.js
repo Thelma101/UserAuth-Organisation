@@ -35,7 +35,7 @@ router.post('/login', validation, async (req, res) => {
     }
     const accessToken = jwt.sign({ userId: user.userId }, secret);
     res.status(200).json({
-        status:'success',
+        status: 'success',
         data: {
             accessToken,
             user
@@ -52,12 +52,12 @@ router.post('/register', validation, async (req, res) => {
             firstName,
             lastName,
             email,
-            password:  hashedPassword,
+            password: hashedPassword,
             phone
         }
     });
     res.status(201).json({
-        status:'success',
+        status: 'success',
         message: 'Registration successful',
         data: {
             accessToken: jwt.sign({ userId: user.userId }, secret),
@@ -81,7 +81,7 @@ router.get('/users/:id', async (req, res) => {
         });
     }
     res.status(200).json({
-        status:'success',
+        status: 'success',
         data: {
             user
         }
