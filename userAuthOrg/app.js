@@ -40,24 +40,49 @@ app.post('/auth/register', async (req, res) => {
         }
     });
 });
+app.post('/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    const user = await prisma.user.findUnique({
+        where: {
+            email
+        }
+    });
+    if (!user) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Invalid email or password',
+            statusCode: 401 
+        });
+}});
 
+app.get('/api/users/:id', async (req, res) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            userId: req.params.id
+        }
+    });
+    if (!user) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'User not found',
+            statusCode: 404
+        });
+    }
+    res.status(200).json({
+        status:'success',
+        data: user
+    });
+});
 
-
+app.get('/api/organisations', async (req, res) => {
+    const organisations = await prisma.organisation.findMany();
+    res.status(200).json({
+        status:'success',
+        data: organisations
+    });
+});
 
 const port = app.config.port || 3000;
-
-// app.post('/auth/register', (req,res) => {
-//     res.status(200).json({
-//         message: 'User registered successfully'
-//     })
-// });
-
-// app.post('/auth/login', (req, res) => {
-//     res.status(200).json({
-//         message: 'User logged in successfully'
-//     })
-// });
-
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
