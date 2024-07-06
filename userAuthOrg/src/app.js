@@ -1,10 +1,10 @@
 const express = require('express');
 const validationRoutes = require('./middleware/validation');
 const authenticateToken = require('./middleware/authenticateToken');
-const authController = require('../controllers/authController');
-const authenticateJWT = require('../middleware/authenticateJWT');
-const authRoutes = require('./authRoutes');
-const userRoutes = require('./userRoutes');
+const authController = require('./controllers/authController');
+const authenticateJWT = require('./middleware/authenticateJWT');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const organisationRoutes = require('./organisationRoutes');
 
 
