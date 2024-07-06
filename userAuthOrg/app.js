@@ -27,12 +27,12 @@ app.post('/auth/register', async (req, res) => {
             firstName,
             lastName,
             email,
-            password:  hashedPassword,
+            password: hashedPassword,
             phone
         }
     });
     res.status(201).json({
-        status:'success',
+        status: 'success',
         message: 'Registration successful',
         data: {
             accessToken: jwt.sign({ userId: user.userId }, secret),
@@ -51,9 +51,10 @@ app.post('/auth/login', async (req, res) => {
         return res.status(401).json({
             status: 'error',
             message: 'Invalid email or password',
-            statusCode: 401 
+            statusCode: 401
         });
-}});
+    }
+});
 
 app.get('/api/users/:id', async (req, res) => {
     const user = await prisma.user.findUnique({
@@ -69,7 +70,7 @@ app.get('/api/users/:id', async (req, res) => {
         });
     }
     res.status(200).json({
-        status:'success',
+        status: 'success',
         data: user
     });
 });
@@ -77,10 +78,24 @@ app.get('/api/users/:id', async (req, res) => {
 app.get('/api/organisations', async (req, res) => {
     const organisations = await prisma.organisation.findMany();
     res.status(200).json({
-        status:'success',
+        status: 'success',
         data: organisations
     });
 });
+
+app.get('/api/organisations/:orgId', async (req, res) => {
+    const organisation = await prisma.organisation.findUnique({
+        where: {
+            orgId: req.params.orgId
+        }
+    });
+    if (!organisation) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'Organisation not found',
+            statusCode: 404
+        });
+    }});
 
 const port = app.config.port || 3000;
 
