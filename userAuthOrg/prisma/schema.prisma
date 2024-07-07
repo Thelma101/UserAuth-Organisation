@@ -1,3 +1,5 @@
+// schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,27 +9,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id          String  @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String  @unique
-  password    String
-  phone       String
-  user_organisations user_organisations[]
+model User {
+  userId        String             @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String             @unique
+  password      String
+  phone         String?
+  createdAt     DateTime           @default(now())
+  organisations UserOrganisation[]
 }
 
-model organisations {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-  user_organisations user_organisations[]
+model Organisation {
+  id            String             @id @default(uuid())
+  name          String
+  description   String?
+  users         UserOrganisation[]
 }
 
-model user_organisations {
-  id          String  @id @default(uuid())
-  user        users    @relation(fields: [userId], references: [id])
-  userId      String
-  organisation organisations @relation(fields: [orgId], references: [id])
-  orgId       String
+model UserOrganisation {
+  userId        String
+  organisationId String
+  user          User               @relation(fields: [userId], references: [userId])
+  organisation  Organisation       @relation(fields: [organisationId], references: [id])
+
+  @@id([userId, organisationId])
 }
