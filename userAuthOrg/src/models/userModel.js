@@ -1,5 +1,3 @@
-// models/User.js
-
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
@@ -8,21 +6,31 @@ const userModel = {
   async createUser(firstName, lastName, email, password, phone) {
     const hashedPassword = await bcrypt.hash(password, 10);
     try {
-      const user = await prisma.user.create({
+      const organisation = await prisma.organisations.findFirst({
+        where: { name: `${firstName}'s Organisation` },
+      });
+      if (!organisation) {
+        organisation = await prisma.organisations.create({ data: { name: `${firstName}'s Organisation` } });
+      }
+      const user = await prisma.users.create({
         data: {
           firstName,
           lastName,
           email,
           password: hashedPassword,
           phone,
-          organisations: {
-            connect: {
-              name: `${firstName}'s Organisation`,
+          user_organisations: {
+            create: {
+              organisationId: organisation.id,
             },
           },
         },
         include: {
-          organisations: true,
+          user_organisations: {
+            include: {
+              organisation: true,
+            },
+          },
         },
       });
       return user;
@@ -36,9 +44,15 @@ const userModel = {
 
   async findUserByEmail(email) {
     try {
-      const user = await prisma.user.findUnique({
+      const user = await prisma.users.findUnique({
         where: { email },
-        include: { organisations: true },
+        include: {
+          user_organisations: {
+            include: {
+              organisation: true,
+            },
+          },
+        },
       });
       if (!user) {
         return { error: 'User not found' };
