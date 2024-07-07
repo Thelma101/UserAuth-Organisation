@@ -24,6 +24,7 @@ const userModel = {
       }
       throw new Error('Could not create user');
     }
+    
   },
 
   async findUserByEmail(email) {
