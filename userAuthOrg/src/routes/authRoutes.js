@@ -1,14 +1,13 @@
-
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { validateUserFields, validateLoginFields } = require('../middleware/validation');
-const router = express.Router();
 const prisma = new PrismaClient();
 
+const router = express.Router();
 const saltRounds = 10;
-const secret = 'your_jwt_secret'; // Replace with your actual secret key
+const secret = process.env.JWT_SECRET || 'your_jwt_secret';
 
 router.post('/register', validateUserFields, async (req, res) => {
     const { firstName, lastName, email, password, phone } = req.body;
@@ -23,7 +22,11 @@ router.post('/register', validateUserFields, async (req, res) => {
                 phone,
                 organisations: {
                     create: {
-                        name: `${firstName}'s Organisation`,
+                        organisation: {
+                            create: {
+                                name: `${firstName}'s Organisation`,
+                            }
+                        }
                     }
                 }
             }
@@ -95,4 +98,3 @@ router.post('/login', validateLoginFields, async (req, res) => {
 });
 
 module.exports = router;
-
