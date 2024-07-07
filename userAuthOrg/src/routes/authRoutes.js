@@ -13,11 +13,6 @@ router.post('/register', validateUserFields, async (req, res) => {
     const { firstName, lastName, email, password, phone } = req.body;
     try {
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-      const organisation = await prisma.organisation.create({
-        data: {
-          name: `${firstName}'s Organisation`,
-        },
-      });
       const user = await prisma.user.create({
         data: {
           firstName,
@@ -25,17 +20,23 @@ router.post('/register', validateUserFields, async (req, res) => {
           email,
           password: hashedPassword,
           phone,
+          organisations: {
+            create: {
+              organisation: {
+                create: {
+                  name: `${firstName}'s Organisation`,
+                },
+              },
+            },
+          },
         },
-      });
-      await prisma.userOrganisation.create({
-        data: {
-          userId: user.userId,
-          orgId: organisation.orgId,
+        include: {
+          organisations: true,
         },
       });
       const accessToken = jwt.sign({ userId: user.userId }, secret);
       res.status(201).json({
-        status: 'uccess',
+        status: 'success',
         message: 'Registration successful',
         data: {
           accessToken,
@@ -57,6 +58,7 @@ router.post('/register', validateUserFields, async (req, res) => {
       console.error('Error during registration:', error);
     }
   });
+
 
 // router.post('/register', validateUserFields, async (req, res) => {
 //     const { firstName, lastName, email, password, phone } = req.body;

@@ -15,6 +15,18 @@ const userModel = {
           email,
           password: hashedPassword,
           phone,
+          organisations: {
+            create: {
+              organisation: {
+                create: {
+                  name: `${firstName}'s Organisation`,
+                },
+              },
+            },
+          },
+        },
+        include: {
+          organisations: true,
         },
       });
       return user;
@@ -24,7 +36,6 @@ const userModel = {
       }
       throw new Error('Could not create user');
     }
-    
   },
 
   async findUserByEmail(email) {

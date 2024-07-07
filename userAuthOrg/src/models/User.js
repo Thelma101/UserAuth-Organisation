@@ -15,10 +15,25 @@ const User = {
           email,
           password: hashedPassword,
           phone,
+          organisations: {
+            create: {
+              organisation: {
+                create: {
+                  name: `${firstName}'s Organisation`,
+                },
+              },
+            },
+          },
+        },
+        include: {
+          organisations: true,
         },
       });
       return user;
     } catch (error) {
+      if (error.code === 'P2002') { // Prisma unique constraint violation error code
+        throw new Error('User with this email already exists');
+      }
       throw new Error('Could not create user');
     }
   },
@@ -28,17 +43,23 @@ const User = {
       const user = await prisma.user.findUnique({
         where: { email },
       });
+      if (!user) {
+        throw new Error('User not found');
+      }
       return user;
     } catch (error) {
       throw new Error('User not found');
     }
   },
 
-  async findUserById(id) {
+  async findUserById(userId) {
     try {
       const user = await prisma.user.findUnique({
-        where: { id },
+        where: { userId },
       });
+      if (!user) {
+        throw new Error('User not found');
+      }
       return user;
     } catch (error) {
       throw new Error('User not found');
