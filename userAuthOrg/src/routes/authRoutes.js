@@ -1,26 +1,39 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+// const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
 const { validateUserFields, validateLoginFields } = require('../middleware/validation');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+// const { PrismaClient } = require('@prisma/client');
+// const prisma = new PrismaClient();
 
 const router = express.Router();
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const prisma = new PrismaClient();
 const saltRounds = 10;
 const secret = process.env.JWT_SECRET || 'your_jwt_secret';
 
-router.post('/register', validateUserFields, async (req, res) => {
+router.post('/register', async (req, res) => {
   const { firstName, lastName, email, password, phone } = req.body;
+
   try {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const organisationName = `${firstName}'s Organisation`;
+
+    // Check if organisation exists or create it
     let organisation = await prisma.organisation.findFirst({
       where: { name: organisationName },
     });
+
     if (!organisation) {
-      organisation = await prisma.organisation.create({ data: { name: organisationName } });
+      organisation = await prisma.organisation.create({
+        data: { name: organisationName },
+      });
     }
-    const user = await prisma.user.create({
+
+    // Create new user
+    const newUser = await prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -29,24 +42,35 @@ router.post('/register', validateUserFields, async (req, res) => {
         phone,
         organisations: {
           connectOrCreate: {
-            where: { organisationId: organisation.orgId },
-            create: { organisationId: organisation.orgId }
-          }
-        }
+            where: {
+              userId_organisationId: {
+                userId: '',
+                organisationId: organisation.orgId,
+              },
+            },
+            create: {
+              userId: '',
+              organisationId: organisation.orgId,
+            },
+          },
+        },
       },
     });
-    const accessToken = jwt.sign({ userId: user.userId }, secret);
+
+    // Generate JWT token
+    const accessToken = jwt.sign({ userId: newUser.userId }, secret);
+
     res.status(201).json({
       status: 'success',
       message: 'Registration successful',
       data: {
         accessToken,
         user: {
-          userId: user.userId,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          phone: user.phone,
+          id: newUser.userId,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email,
+          phone: newUser.phone,
         },
       },
     });
@@ -57,48 +81,8 @@ router.post('/register', validateUserFields, async (req, res) => {
       message: 'Registration unsuccessful',
       statusCode: 400,
     });
-  }
-});
-
-router.post('/login', validateLoginFields, async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: { organisations: true },
-    });
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid email or password',
-        statusCode: 401,
-      });
-    }
-
-    const accessToken = jwt.sign({ userId: user.userId }, secret);
-    res.status(200).json({
-      status: 'success',
-      message: 'Login successful',
-      data: {
-        accessToken,
-        user: {
-          userId: user.userId,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          phone: user.phone,
-        },
-      },
-    });
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({
-      status: 'Internal server error',
-      message: 'Login failed',
-      statusCode: 500,
-    });
+  } finally {
+    await prisma.$disconnect();
   }
 });
 
